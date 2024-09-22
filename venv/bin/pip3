@@ -1,4 +1,6 @@
-#!/Users/makoye/Desktop/meeting-scheduler/venv/bin/python3.12
+#!/bin/sh
+'''exec' "/Users/calvincai/Desktop/School/Senior Year/CSDS 383/meeting-scheduler/venv/bin/python3" "$0" "$@"
+' '''
 # -*- coding: utf-8 -*-
 import re
 import sys

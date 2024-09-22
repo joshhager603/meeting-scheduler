@@ -7,5 +7,5 @@ def read_participant():
 def update_participant():
     pass
 
-def delete_participant():
+def delete_participant(participant_id):
     pass
