@@ -71,12 +71,11 @@ def list_calendars_cli():
 
 # Create an Attachment
 @cli.command()
-@click.option('--id', prompt='Attachment ID', help='Optional: ID of the attachment', default='', type = int)
+@click.option('--id', prompt='Attachment ID', help='Optional: ID of the attachment', default='')
 @click.option('--meeting_id', prompt='Meeting ID', help='ID of meeting associated with attachment', type = int)
 @click.option('--url', prompt='Attachment URL', help='URL of the attachment')
 def create_attachment_cli(id, meeting_id, url):
     attachment_id = create_attachment(meeting_id, url, id)
-    print(attachment_id)
     if attachment_id is not None:
         click.echo(f'Attachment created with ID: {attachment_id}')
     else:
