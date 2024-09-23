@@ -184,6 +184,62 @@ def list_meetings_cli():
 
 # END OF MEETING CLI COMMANDS
 
+# START OF PARTICIPANT COMMANDS
+
+# Create a Participant
+@cli.command()
+@click.option('--participant_id', prompt='Participant ID', help='Optional: ID of the participant', default='')
+@click.option('--meeting_id', prompt='Meeting ID', help='ID of meeting associated with participant', type = int)
+@click.option('--name', prompt='Participant Name', help='Name of the participant')
+@click.option('--email', prompt='Participant Email', help='Email of the participant')
+def create_participant_cli(participant_id, meeting_id, name, email):
+    participant_id = create_participant(participant_id, meeting_id, name, email)
+    if participant_id is not None:
+        click.echo(f'Participant created with ID: {participant_id}')
+    else:
+        click.echo('Participant creation failed')
+        
+# Read an Participant
+@cli.command()
+@click.argument('participant_id', type = int)
+def read_participant_cli(participant_id):
+    participant = read_participant(participant_id)
+    if participant:
+        click.echo(f'Participant: {participant}')
+    else:
+        click.echo('Participant not found')
+
+@cli.command()
+def read_all_participants_cli():
+    participants = read_participant()
+    if participants:
+        click.echo(f'{participants}')
+    else:
+        click.echo('No participants found')
+
+# Update a participant
+@cli.command()
+@click.argument('participant_id', type = int)
+@click.option('--meeting_id', help='New Meeting ID', type = int)
+@click.option('--name', help='New Participant Name')
+@click.option('--email', help='New Participant Email')
+def update_participant_cli(participant_id, meeting_id, name, email):
+    updated_participant = update_participant(participant_id, meeting_id=meeting_id, name=name, email=email)
+    if updated_participant:
+        click.echo(f'Participant updated: {updated_participant}')
+
+# Delete an Participant
+@cli.command()
+@click.argument('participant_id', type = int)
+def delete_participant_cli(participant_id):
+    success = delete_participant(participant_id)
+    if success:
+        click.echo(f'Participant {participant_id} deleted.')
+    else:
+        click.echo('Participant deletion failed')
+
+# END OF PARTICIPANT COMMANDS
+
 # Main entry point
 if __name__ == '__main__':
     cli()

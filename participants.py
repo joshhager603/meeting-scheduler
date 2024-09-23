@@ -15,7 +15,7 @@ def is_email_valid(participant_email):
         return False
 
 #Create a participant with its participant id, meeting id, name and email
-def create_participant(meeting_id, participant_id, participant_name, participant_email):
+def create_participant(participant_id, meeting_id, participant_name, participant_email):
     if participants_table.search(query.participant_id == participant_id):
         print("Participant with id already exists")
         return False
@@ -31,6 +31,7 @@ def create_participant(meeting_id, participant_id, participant_name, participant
         'participant_name' : truncate_string(participant_name, 600),
         'participant_email' : participant_email
     })
+    return participant_id
 
 #Read a participant by its ID
 def read_participant(participant_id=None):
