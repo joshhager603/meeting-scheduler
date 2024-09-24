@@ -72,7 +72,7 @@ def list_calendars_cli():
 # Create an Attachment
 @cli.command()
 @click.option('--id', prompt='Attachment ID', help='Optional: ID of the attachment', default='')
-@click.option('--meeting_id', prompt='Meeting ID', help='ID of meeting associated with attachment', type = int)
+@click.option('--meeting_id', prompt='Meeting ID', help='ID of meeting associated with attachment')
 @click.option('--url', prompt='Attachment URL', help='URL of the attachment')
 def create_attachment_cli(id, meeting_id, url):
     attachment_id = create_attachment(meeting_id, url, id)
@@ -83,7 +83,7 @@ def create_attachment_cli(id, meeting_id, url):
 
 # Read an Attachment
 @cli.command()
-@click.argument('attachment_id', type = int)
+@click.argument('attachment_id')
 def read_attachment_cli(attachment_id):
     attachment = read_attachment(attachment_id)
     if attachment:
@@ -101,8 +101,8 @@ def read_all_attachments_cli():
 
 # Update an Attachment
 @cli.command()
-@click.argument('attachment_id', type = int)
-@click.option('--meeting_id', help='New Meeting ID', type = int)
+@click.argument('attachment_id')
+@click.option('--meeting_id', help='New Meeting ID')
 @click.option('--url', help='New URL')
 def update_attachment_cli(attachment_id, meeting_id, url):
     updated_attachment = update_attachment(attachment_id, meeting_id=meeting_id, attachment_url=url)
@@ -111,7 +111,7 @@ def update_attachment_cli(attachment_id, meeting_id, url):
 
 # Delete an Attachment
 @cli.command()
-@click.argument('attachment_id', type = int)
+@click.argument('attachment_id')
 def delete_attachment_cli(attachment_id):
     success = delete_attachment(attachment_id)
     if success:
@@ -189,7 +189,7 @@ def list_meetings_cli():
 # Create a Participant
 @cli.command()
 @click.option('--participant_id', prompt='Participant ID', help='Optional: ID of the participant', default='')
-@click.option('--meeting_id', prompt='Meeting ID', help='ID of meeting associated with participant', type = int)
+@click.option('--meeting_id', prompt='Meeting ID', help='ID of meeting associated with participant')
 @click.option('--name', prompt='Participant Name', help='Name of the participant')
 @click.option('--email', prompt='Participant Email', help='Email of the participant')
 def create_participant_cli(participant_id, meeting_id, name, email):
@@ -201,7 +201,7 @@ def create_participant_cli(participant_id, meeting_id, name, email):
         
 # Read an Participant
 @cli.command()
-@click.argument('participant_id', type = int)
+@click.argument('participant_id')
 def read_participant_cli(participant_id):
     participant = read_participant(participant_id)
     if participant:
@@ -219,8 +219,8 @@ def read_all_participants_cli():
 
 # Update a participant
 @cli.command()
-@click.argument('participant_id', type = int)
-@click.option('--meeting_id', help='New Meeting ID', type = int)
+@click.argument('participant_id')
+@click.option('--meeting_id', help='New Meeting ID')
 @click.option('--name', help='New Participant Name')
 @click.option('--email', help='New Participant Email')
 def update_participant_cli(participant_id, meeting_id, name, email):
@@ -230,7 +230,7 @@ def update_participant_cli(participant_id, meeting_id, name, email):
 
 # Delete an Participant
 @cli.command()
-@click.argument('participant_id', type = int)
+@click.argument('participant_id')
 def delete_participant_cli(participant_id):
     success = delete_participant(participant_id)
     if success:
