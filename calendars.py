@@ -1,6 +1,7 @@
 from tinydb import Query
 from database import calendars_table
 from common import generate_uuid, truncate_string
+from meetings import delete_meeting
 
 # Create a calendar with title, details, and a list of meetings (initially can be empty)
 def create_calendar(title, details, meetings):
@@ -50,6 +51,8 @@ def delete_calendar(calendar_id):
 
     #Delete meetings attached to this calendar
     #loops through the meeting id and deletes them
+    for meeting_id in calendar['meetings']:
+        delete_meeting(meeting_id)
     
     # Remove the calendar
     calendars_table.remove(Calendar.id == calendar_id)
