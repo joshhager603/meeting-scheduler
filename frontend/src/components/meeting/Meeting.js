@@ -3,18 +3,20 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useStateContext } from '../../context/CalendarContext';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import AddParticipantModal from '../participant/AddParticipantModal'; // Import the AddParticipantModal component
 
 const Meeting = () => {
     const { id } = useParams(); // Get the meeting ID from the URL
-    const { selectedCalendar, assignParticipantToMeeting, removeParticipantFromMeeting, participants, updateMeeting, selectCalendar } = useStateContext();
+    const { selectedCalendar, assignParticipantToMeeting, removeParticipantFromMeeting, participants, updateMeeting } = useStateContext();
     const [meeting, setMeeting] = useState(null);
     const [title, setTitle] = useState('');
     const [location, setLocation] = useState('');
     const [details, setDetails] = useState('');
-    const [date, setDate] = useState(new Date()); // New state for date
-    const [time, setTime] = useState(''); // New state for time
+    const [date, setDate] = useState(new Date());
+    const [time, setTime] = useState('');
     const [selectedParticipant, setSelectedParticipant] = useState('');
     const [currentParticipants, setCurrentParticipants] = useState([]);
+    const [isParticipantModalVisible, setParticipantModalVisible] = useState(false); // For showing/hiding the modal
     const navigate = useNavigate();
 
     // Load the meeting details when the component is mounted
@@ -26,8 +28,8 @@ const Meeting = () => {
                 setTitle(foundMeeting.title);
                 setLocation(foundMeeting.location);
                 setDetails(foundMeeting.details);
-                setDate(new Date(foundMeeting.date)); // Initialize with meeting date
-                setTime(foundMeeting.time); // Initialize with meeting time
+                setDate(new Date(foundMeeting.date));
+                setTime(foundMeeting.time);
                 setCurrentParticipants(foundMeeting.participants || []);
             }
         }
@@ -49,7 +51,6 @@ const Meeting = () => {
     };
 
     const handleUpdateMeeting = () => {
-        // Update the meeting details (handle saving to the backend if necessary)
         const updatedMeeting = {
             ...meeting,
             title,
@@ -62,6 +63,10 @@ const Meeting = () => {
 
         updateMeeting(selectedCalendar.id, updatedMeeting);
         navigate(`/weeklyCalendar/${selectedCalendar?.id}`);
+    };
+
+    const handleAddNewParticipant = (newParticipant) => {
+        setParticipantModalVisible(false); // Close the modal after adding the new participant
     };
 
     if (!meeting) {
@@ -123,18 +128,28 @@ const Meeting = () => {
             {/* Participant Assignment */}
             <div className="mt-6">
                 <h3 className="text-lg font-bold mb-2">Assign Participant:</h3>
-                <select
-                    className="border p-2 w-full mb-4"
-                    value={selectedParticipant}
-                    onChange={(e) => setSelectedParticipant(e.target.value)}
-                >
-                    <option value="">Select Participant</option>
-                    {participants.map((participant) => (
-                        <option key={participant.id} value={participant.id}>
-                            {`${participant.name} (${participant.id.slice(0, 4)})`}
-                        </option>
-                    ))}
-                </select>
+                <div className="flex items-center">
+                    <select
+                        className="border p-2 w-full mb-4"
+                        value={selectedParticipant}
+                        onChange={(e) => setSelectedParticipant(e.target.value)}
+                    >
+                        <option value="">Select Participant</option>
+                        {participants.map((participant) => (
+                            <option key={participant.id} value={participant.id}>
+                                {`${participant.name} (${participant.id.slice(0, 4)})`}
+                            </option>
+                        ))}
+                    </select>
+
+                    {/* Button to open modal to add a new participant */}
+                    <button
+                        className="ml-2 bg-green-500 text-white px-4 py-2 rounded"
+                        onClick={() => setParticipantModalVisible(true)} // Open modal for adding a new participant
+                    >
+                        + Add Participant
+                    </button>
+                </div>
 
                 <button
                     className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
@@ -170,6 +185,13 @@ const Meeting = () => {
             >
                 Save Changes
             </button>
+
+            {/* Participant Modal */}
+            <AddParticipantModal
+                show={isParticipantModalVisible}
+                onClose={() => setParticipantModalVisible(false)}
+                onAddParticipant={handleAddNewParticipant} // Handle adding the new participant
+            />
         </div>
     );
 };

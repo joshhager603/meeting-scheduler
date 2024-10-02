@@ -1,11 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStateContext } from '../../context/CalendarContext';
 
-const AddParticipantModal = ({ show, onClose }) => {
-    const { addParticipant } = useStateContext();
+const AddParticipantModal = ({ show, onClose, participant }) => {
+    const { addParticipant, updateParticipant } = useStateContext();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [errors, setErrors] = useState({ name: '', email: '' });
+
+    useEffect(() => {
+        if (participant) {
+            // Pre-fill the modal with the participant's current data when editing
+            setName(participant.name);
+            setEmail(participant.email);
+        } else {
+            setName('');
+            setEmail('');
+        }
+    }, [participant]);
 
     if (!show) return null;
 
@@ -24,7 +35,14 @@ const AddParticipantModal = ({ show, onClose }) => {
         }
 
         if (valid) {
-            addParticipant(name, email);
+            if (participant) {
+                // Update existing participant
+                updateParticipant(participant.id, name, email);
+            } else {
+                // Add new participant
+                addParticipant(name, email);
+            }
+
             setName('');
             setEmail('');
             onClose(); // Close modal after saving
@@ -36,7 +54,7 @@ const AddParticipantModal = ({ show, onClose }) => {
     return (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
             <div className="bg-white p-6 rounded-lg">
-                <h2 className="text-xl font-bold mb-4">Add Participant</h2>
+                <h2 className="text-xl font-bold mb-4">{participant ? 'Edit Participant' : 'Add Participant'}</h2>
 
                 <div className="mb-4">
                     <label className="block font-bold">Name:</label>
@@ -63,7 +81,7 @@ const AddParticipantModal = ({ show, onClose }) => {
                         Cancel
                     </button>
                     <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={handleSubmit}>
-                        Save
+                        {participant ? 'Update' : 'Save'}
                     </button>
                 </div>
             </div>

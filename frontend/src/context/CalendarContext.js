@@ -20,6 +20,15 @@ export const CalendarProvider = ({ children }) => {
         setCalendars((prevCalendars) => [...prevCalendars, newCalendar]);
     };
 
+    // Update an existing calendar
+    const updateCalendar = (calendarId, title, details) => {
+        setCalendars((prevCalendars) =>
+            prevCalendars.map((calendar) =>
+                calendar.id === calendarId ? { ...calendar, title, details } : calendar
+            )
+        );
+    };
+
     // Remove a calendar
     const removeCalendar = (calendarId) => {
         setCalendars((prevCalendars) => prevCalendars.filter(calendar => calendar.id !== calendarId));
@@ -35,6 +44,20 @@ export const CalendarProvider = ({ children }) => {
         };
 
         setParticipants((prevParticipants) => [...prevParticipants, newParticipant]);
+    };
+
+     // Remove a participant
+     const removeParticipant = (participantId) => {
+        setParticipants((prevParticipants) => prevParticipants.filter(participant => participant.id !== participantId));
+    };
+
+      // Update an existing participant
+      const updateParticipant = (participantId, name, email) => {
+        setParticipants((prevParticipants) =>
+            prevParticipants.map((participant) =>
+                participant.id === participantId ? { ...participant, name, email } : participant
+            )
+        );
     };
 
     // Add participant to a meeting
@@ -178,6 +201,9 @@ const updateMeeting = (calendarId, meeting) => {
                 removeParticipantFromMeeting, 
                 removeMeetingFromCalendar,
                 updateMeeting,
+                removeParticipant,
+                updateParticipant,
+                updateCalendar,
             }}
         >
             {children}

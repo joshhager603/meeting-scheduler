@@ -1,17 +1,29 @@
 import React, { useState, useContext } from 'react';
 import { CalendarContext } from '../../context/CalendarContext';
 import AddParticipantModal from './AddParticipantModal';
+import { FaTrashAlt, FaEdit } from 'react-icons/fa'; // Import the trash and edit icons
 
 const Participants = () => {
-    const { participants } = useContext(CalendarContext);
+    const { participants, removeParticipant, updateParticipant } = useContext(CalendarContext); // Include updateParticipant from context
     const [participantModalVisible, setParticipantModalVisible] = useState(false);
+    const [editParticipant, setEditParticipant] = useState(null); // Track participant to be edited
 
     const openParticipantModal = () => {
         setParticipantModalVisible(true);
+        setEditParticipant(null); // Set to null for adding a new participant
     };
 
     const closeParticipantModal = () => {
         setParticipantModalVisible(false);
+    };
+
+    const handleDeleteParticipant = (participantId) => {
+        removeParticipant(participantId); // Delete participant using the context function
+    };
+
+    const handleEditParticipant = (participant) => {
+        setEditParticipant(participant); // Set the participant to be edited
+        setParticipantModalVisible(true); // Open the modal in edit mode
     };
 
     return (
@@ -31,8 +43,22 @@ const Participants = () => {
                 <div className="bg-white p-4 rounded-lg shadow-lg">
                     <ul>
                         {participants.map((participant) => (
-                            <li key={participant.id} className="mb-2 text-lg">
-                                {participant.name} ({participant.id.slice(0, 4)})
+                            <li key={participant.id} className="mb-2 text-lg flex justify-between items-center">
+                                <span>{participant.name} ({participant.id.slice(0, 4)})</span>
+                                <div className="flex space-x-4">
+                                    <button
+                                        className="text-blue-500 hover:text-blue-700"
+                                        onClick={() => handleEditParticipant(participant)} // Edit participant
+                                    >
+                                        <FaEdit size={18} />
+                                    </button>
+                                    <button
+                                        className="text-red-500 hover:text-red-700"
+                                        onClick={() => handleDeleteParticipant(participant.id)} // Delete participant
+                                    >
+                                        <FaTrashAlt size={18} />
+                                    </button>
+                                </div>
                             </li>
                         ))}
                     </ul>
@@ -47,6 +73,7 @@ const Participants = () => {
             <AddParticipantModal
                 show={participantModalVisible}
                 onClose={closeParticipantModal}
+                participant={editParticipant} // Pass the participant to be edited
             />
         </div>
     );
