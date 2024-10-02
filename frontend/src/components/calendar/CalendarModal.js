@@ -1,11 +1,11 @@
 import React, { useContext, useState } from 'react';
-import { CalendarContext } from '../../context/CalendarContext';
+import { useStateContext } from '../../context/CalendarContext';
 
 const CalendarModal = ({ show, onClose}) => {
     const [title, setTitle] = useState('');
     const [details, setDetails] = useState('');
     const [errors, setErrors] = useState({ title: '', details: '' });
-    const {selectCalendar, addCalendar } = useContext(CalendarContext);
+    const {selectCalendar, addCalendar } = useStateContext();
 
     if (!show) return null;
 

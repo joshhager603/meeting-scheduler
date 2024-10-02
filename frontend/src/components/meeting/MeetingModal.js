@@ -1,8 +1,8 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { CalendarContext } from '../../context/CalendarContext';
+import {useStateContext } from '../../context/CalendarContext';
 
 const MeetingModal = ({ show, onClose, calendarId, meeting, day, hour }) => {
-    const { addMeeting, selectCalendar} = useContext(CalendarContext); // Access context functions
+    const { addMeeting, selectCalendar} = useStateContext(); // Access context functions
     const [title, setTitle] = useState('');
     const [details, setDetails] = useState('');
     const [errors, setErrors] = useState({ title: '', details: '' });

@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 // Create a context for calendars
@@ -26,21 +26,21 @@ export const CalendarProvider = ({ children }) => {
             title: meeting.title,
             details: meeting.details,
             day: meeting.day,
-            hour: meeting.hour
+            hour: meeting.hour,
         };
     
-        // Update calendars with a new meeting
-        setCalendars((prevCalendars) => 
-            prevCalendars.map((calendar) => {
+        // Update the calendars with the new meeting
+        setCalendars((prevCalendars) => {
+            const updatedCalendars = [...prevCalendars];
+            
+            updatedCalendars.forEach((calendar) => {
                 if (calendar.id === calendarId) {
-                    return {
-                        ...calendar,
-                        meetings: [...calendar.meetings, newMeeting], // Add new meeting
-                    };
+                    calendar.meetings.push(newMeeting); // Push new meeting directly
                 }
-                return calendar;
-            })
-        );
+            });
+    
+            return updatedCalendars;
+        });
     };
 
     // Select a calendar for viewing
@@ -63,3 +63,9 @@ export const CalendarProvider = ({ children }) => {
         </CalendarContext.Provider>
     );
 };
+
+export const useStateContext = () => {
+    return useContext(CalendarContext);
+  };
+  
+  export default CalendarProvider;

@@ -21,7 +21,7 @@ const App = () => {
     };
 
     return (
-        <div>
+        <>
             {selectedCalendar ? (
                 <div>
                     <button
@@ -68,14 +68,8 @@ const App = () => {
                 onClose={() => setModalVisible(false)}
                 onSave={handleSaveCalendar}
             />
-        </div>
+        </>
     );
 };
 
-export default function WrappedApp() {
-    return (
-        <CalendarProvider>
-            <App />
-        </CalendarProvider>
-    );
-}
+export default App;
