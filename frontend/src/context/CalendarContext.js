@@ -20,6 +20,12 @@ export const CalendarProvider = ({ children }) => {
         setCalendars((prevCalendars) => [...prevCalendars, newCalendar]);
     };
 
+    // Remove a calendar
+    const removeCalendar = (calendarId) => {
+        setCalendars((prevCalendars) => prevCalendars.filter(calendar => calendar.id !== calendarId));
+        setSelectedCalendar(null); // Clear selected calendar if it's the one being deleted
+    };
+
     // Add a new participant
     const addParticipant = (name, email) => {
         const newParticipant = {
@@ -79,12 +85,14 @@ export const CalendarProvider = ({ children }) => {
     // Add a meeting
     const addMeeting = (calendarId, meeting) => {
         const newMeeting = {
-            id: meeting.id || uuidv4(),
+            id: uuidv4(),
             title: meeting.title,
             details: meeting.details,
-            day: meeting.day,
-            hour: meeting.hour,
-            participants: meeting.participants || [], // Initialize participants
+            date: meeting.date,
+            time: meeting.time,
+            participants: meeting.participants || [], 
+            location: meeting.location
+
         };
 
         setCalendars((prevCalendars) => {
@@ -100,6 +108,36 @@ export const CalendarProvider = ({ children }) => {
 
         return newMeeting;
     };
+
+    // Update an existing meeting
+const updateMeeting = (calendarId, meeting) => {
+    setCalendars((prevCalendars) => {
+        const updatedCalendars = [...prevCalendars];
+
+        updatedCalendars.forEach((calendar) => {
+            if (calendar.id === calendarId) {
+                const existingMeetingIndex = calendar.meetings.findIndex(
+                    (m) => m.id === meeting.id
+                );
+
+                if (existingMeetingIndex !== -1) {
+                    // Update the existing meeting's details
+                    calendar.meetings[existingMeetingIndex] = {
+                        ...calendar.meetings[existingMeetingIndex],
+                        title: meeting.title,
+                        details: meeting.details,
+                        date: meeting.date,
+                        time: meeting.time,
+                        participants: meeting.participants || [],
+                        location: meeting.location,
+                    };
+                }
+            }
+        });
+
+        return updatedCalendars;
+    });
+};
 
     // Remove a meeting from a calendar
     const removeMeetingFromCalendar = (calendarId, meetingId) => {
@@ -132,12 +170,14 @@ export const CalendarProvider = ({ children }) => {
                 participants, 
                 selectedCalendar,
                 addCalendar,
+                removeCalendar,
                 selectCalendar,
                 addMeeting,
                 addParticipant, 
                 assignParticipantToMeeting, 
                 removeParticipantFromMeeting, 
                 removeMeetingFromCalendar,
+                updateMeeting,
             }}
         >
             {children}

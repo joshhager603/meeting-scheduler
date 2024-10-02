@@ -1,13 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useStateContext } from '../../context/CalendarContext';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const Meeting = () => {
     const { id } = useParams(); // Get the meeting ID from the URL
-    const { selectedCalendar, assignParticipantToMeeting, removeParticipantFromMeeting, participants } = useStateContext();
+    const { selectedCalendar, assignParticipantToMeeting, removeParticipantFromMeeting, participants, updateMeeting, selectCalendar } = useStateContext();
     const [meeting, setMeeting] = useState(null);
+    const [title, setTitle] = useState('');
+    const [location, setLocation] = useState('');
+    const [details, setDetails] = useState('');
+    const [date, setDate] = useState(new Date()); // New state for date
+    const [time, setTime] = useState(''); // New state for time
     const [selectedParticipant, setSelectedParticipant] = useState('');
     const [currentParticipants, setCurrentParticipants] = useState([]);
+    const navigate = useNavigate();
 
     // Load the meeting details when the component is mounted
     useEffect(() => {
@@ -15,6 +23,11 @@ const Meeting = () => {
             const foundMeeting = selectedCalendar.meetings.find((meet) => meet.id === id);
             if (foundMeeting) {
                 setMeeting(foundMeeting);
+                setTitle(foundMeeting.title);
+                setLocation(foundMeeting.location);
+                setDetails(foundMeeting.details);
+                setDate(new Date(foundMeeting.date)); // Initialize with meeting date
+                setTime(foundMeeting.time); // Initialize with meeting time
                 setCurrentParticipants(foundMeeting.participants || []);
             }
         }
@@ -35,16 +48,77 @@ const Meeting = () => {
         setCurrentParticipants(currentParticipants.filter(p => p.id !== participantId));
     };
 
+    const handleUpdateMeeting = () => {
+        // Update the meeting details (handle saving to the backend if necessary)
+        const updatedMeeting = {
+            ...meeting,
+            title,
+            location,
+            details,
+            date: date.toISOString().split('T')[0], // Format date to 'YYYY-MM-DD'
+            time,
+            participants: currentParticipants,
+        };
+
+        updateMeeting(selectedCalendar.id, updatedMeeting);
+        navigate(`/weeklyCalendar/${selectedCalendar?.id}`);
+    };
+
     if (!meeting) {
         return <p>Loading meeting details...</p>;
     }
 
     return (
         <div className="p-6">
-            <h2 className="text-2xl font-bold mb-4">{meeting.title}</h2>
-            <p className="mb-4">{meeting.details}</p>
-            <p><strong>Day:</strong> {meeting.day}</p>
-            <p><strong>Hour:</strong> {meeting.hour}:00</p>
+            <h2 className="text-2xl font-bold mb-4">Edit Meeting</h2>
+
+            <div className="mb-4">
+                <label className="block font-bold">Title:</label>
+                <input
+                    className="border p-2 w-full"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                />
+            </div>
+
+            <div className="mb-4">
+                <label className="block font-bold">Location:</label>
+                <input
+                    className="border p-2 w-full"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                />
+            </div>
+
+            <div className="mb-4">
+                <label className="block font-bold">Details:</label>
+                <textarea
+                    className="border p-2 w-full"
+                    value={details}
+                    onChange={(e) => setDetails(e.target.value)}
+                />
+            </div>
+
+            {/* Date and Time Editing */}
+            <div className="mb-4">
+                <label className="block font-bold">Date:</label>
+                <DatePicker
+                    selected={date}
+                    onChange={(newDate) => setDate(newDate)}
+                    dateFormat="MMMM d, yyyy"
+                    className="border p-2 w-full"
+                />
+            </div>
+
+            <div className="mb-4">
+                <label className="block font-bold">Time:</label>
+                <input
+                    type="time"
+                    className="border p-2 w-full"
+                    value={time}
+                    onChange={(e) => setTime(e.target.value)}
+                />
+            </div>
 
             {/* Participant Assignment */}
             <div className="mt-6">
@@ -70,7 +144,7 @@ const Meeting = () => {
                 </button>
 
                 {/* Display the list of participants */}
-                {currentParticipants.length > 0 && (
+                {currentParticipants?.length > 0 && (
                     <div className="mt-4">
                         <h3 className="text-lg font-bold mb-2">Participants:</h3>
                         <ul>
@@ -89,6 +163,13 @@ const Meeting = () => {
                     </div>
                 )}
             </div>
+
+            <button
+                className="bg-green-500 text-white px-4 py-2 rounded mt-4"
+                onClick={handleUpdateMeeting}
+            >
+                Save Changes
+            </button>
         </div>
     );
 };

@@ -2,9 +2,10 @@ import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CalendarContext } from '../../context/CalendarContext';
 import CalendarModal from './CalendarModal';
+import { FaTrashAlt } from 'react-icons/fa'; // Import the trash icon
 
 const Calendars = () => {
-    const { calendars, addCalendar, selectCalendar} = useContext(CalendarContext);
+    const { calendars, addCalendar, selectCalendar, removeCalendar } = useContext(CalendarContext); // Include removeCalendar
     const [calendarModalVisible, setCalendarModalVisible] = useState(false);
     const navigate = useNavigate();
 
@@ -22,11 +23,15 @@ const Calendars = () => {
     };
 
     const handleSelectCalendar = (calendarId) => {
-        //set the calendar
+        // Set the selected calendar
         selectCalendar(calendarId);
-        
         // Navigate to the weekly calendar page with the calendar ID
         navigate(`/weeklyCalendar/${calendarId}`);
+    };
+
+    const handleDeleteCalendar = (calendarId) => {
+        // Remove the calendar using the context function
+        removeCalendar(calendarId);
     };
 
     return (
@@ -45,13 +50,26 @@ const Calendars = () => {
             {calendars.length > 0 ? (
                 <div className="grid grid-cols-2 gap-4">
                     {calendars.map((calendar) => (
-                        <button
-                            key={calendar.id}
-                            className="bg-green-800 text-white p-4 rounded-lg"
-                            onClick={() => handleSelectCalendar(calendar.id)} // Navigate with ID
-                        >
-                            {calendar.title}
-                        </button>
+                        <div key={calendar.id} className="relative bg-green-800 text-white p-4 rounded-lg shadow-md">
+                            {/* Delete Calendar Button (positioned at top-right corner) */}
+                            <button
+                                className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                                onClick={(e) => {
+                                    e.stopPropagation(); // Prevent the click event from navigating to the calendar
+                                    handleDeleteCalendar(calendar.id);
+                                }}
+                            >
+                                <FaTrashAlt size={18} />
+                            </button>
+
+                            {/* Calendar Title - Click to navigate to weekly calendar */}
+                            <div
+                                className="cursor-pointer"
+                                onClick={() => handleSelectCalendar(calendar.id)} // Navigate with ID
+                            >
+                                {calendar.title}
+                            </div>
+                        </div>
                     ))}
                 </div>
             ) : (
