@@ -80,12 +80,12 @@ WSGI_APPLICATION = "backend.wsgi.application"
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'meeting_scheduler',
-        'USER': os.getenv('PG_USER'),
-        'PASSWORD': os.getenv('PG_PW'),
+        'USER': os.getenv('MYSQL_USER'),
+        'PASSWORD': os.getenv('MYSQL_PW'),
         'HOST': 'localhost',
-        'PORT': '5432',
+        'PORT': '33060',
     }
 }
 
