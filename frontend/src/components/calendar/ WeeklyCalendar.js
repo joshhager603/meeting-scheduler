@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import MeetingModal from '../meeting/MeetingModal';
 import { useStateContext } from '../../context/CalendarContext';
+import { useNavigate } from 'react-router-dom';
 
 const hours = [...Array(24).keys()];
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];

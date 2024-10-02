@@ -4,7 +4,7 @@ import { CalendarContext } from '../../context/CalendarContext';
 import CalendarModal from './CalendarModal';
 
 const Calendars = () => {
-    const { calendars, addCalendar } = useContext(CalendarContext);
+    const { calendars, addCalendar, selectCalendar} = useContext(CalendarContext);
     const [calendarModalVisible, setCalendarModalVisible] = useState(false);
     const navigate = useNavigate();
 
@@ -22,6 +22,9 @@ const Calendars = () => {
     };
 
     const handleSelectCalendar = (calendarId) => {
+        //set the calendar
+        selectCalendar(calendarId);
+        
         // Navigate to the weekly calendar page with the calendar ID
         navigate(`/weeklyCalendar/${calendarId}`);
     };

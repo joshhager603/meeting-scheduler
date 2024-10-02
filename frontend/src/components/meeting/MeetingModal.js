@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useStateContext } from '../../context/CalendarContext';
+import { Link, useNavigate } from 'react-router-dom';
 
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const hours = [...Array(24).keys()];
 
 const MeetingModal = ({ show, onClose, calendarId, meeting, day: initialDay, hour: initialHour }) => {
-    const { addMeeting, assignParticipantToMeeting, selectCalendar, participants } = useStateContext();
+    const { addMeeting, selectCalendar } = useStateContext();
     const [title, setTitle] = useState('');
     const [details, setDetails] = useState('');
     const [selectedDay, setSelectedDay] = useState(initialDay || 'Sunday');
     const [selectedHour, setSelectedHour] = useState(initialHour || 0);
-    const [selectedParticipant, setSelectedParticipant] = useState('');
     const [errors, setErrors] = useState({ title: '', details: '' });
+    const navigate = useNavigate();
 
-    const [currentParticipants, setCurrentParticipants] = useState([]);
 
     // Effect to update the modal state when the `meeting` prop changes
     useEffect(() => {
@@ -22,13 +22,11 @@ const MeetingModal = ({ show, onClose, calendarId, meeting, day: initialDay, hou
             setDetails(meeting.details);
             setSelectedDay(meeting.day);
             setSelectedHour(meeting.hour);
-            setCurrentParticipants(meeting.participants || []); // Load existing participants
         } else {
             setTitle('');
             setDetails('');
             setSelectedDay(initialDay || 'Sunday');
             setSelectedHour(initialHour || 0);
-            setCurrentParticipants([]);
         }
     }, [meeting, initialDay, initialHour]);
 
@@ -60,24 +58,27 @@ const MeetingModal = ({ show, onClose, calendarId, meeting, day: initialDay, hou
                 details,
                 day: selectedDay,
                 hour: selectedHour,
-                participants: currentParticipants,
             };
 
-            addMeeting(calendarId, newMeeting);
+           const response =  addMeeting(calendarId, newMeeting);
             selectCalendar(calendarId);
             onClose();
+            return response;
         }
     };
 
-    const handleAssignParticipant = () => {
-        if (selectedParticipant) {
-            assignParticipantToMeeting(calendarId, meeting?.id || undefined, selectedParticipant);
-            const participant = participants.find(p => p.id === selectedParticipant);
-            if (participant && !currentParticipants.some(p => p.id === participant.id)) {
-                setCurrentParticipants([...currentParticipants, participant]);
-            }
+    const handleMeetingClick =()=>{
+        if(meeting){
+         navigate(`/meeting/${meeting.id}`);
+         return;
         }
-    };
+
+        const newMeeting = handleSubmit();
+        if(newMeeting){
+            navigate(`/meeting/${newMeeting.id}`);
+        }
+        
+    }
 
     return (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
@@ -135,43 +136,9 @@ const MeetingModal = ({ show, onClose, calendarId, meeting, day: initialDay, hou
                     </select>
                 </div>
 
-                {/* Participant Assignment */}
                 <div className="mb-4">
-                    <label className="block font-bold">Assign Participant:</label>
-                    <select
-                        className="border p-2 w-full"
-                        value={selectedParticipant}
-                        onChange={(e) => setSelectedParticipant(e.target.value)}
-                    >
-                        <option value="">Select Participant</option>
-                        {participants.map((participant) => (
-                            <option key={participant.id} value={participant.id}>
-                                {`${participant.name} (${participant.id.slice(0, 4)})`}
-                            </option>
-                        ))}
-                    </select>
+                {<button className="bg-blue-500 text-white px-4 py-2 rounded"  onClick={handleMeetingClick}>Add Participants</button> }
                 </div>
-
-                <button
-                    className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
-                    onClick={handleAssignParticipant}
-                >
-                    Add Participant to Meeting
-                </button>
-
-                {/* Display the list of participants */}
-                {currentParticipants.length > 0 && (
-                    <div className="mb-4">
-                        <h3 className="text-lg font-bold mb-2">Participants:</h3>
-                        <ul>
-                            {currentParticipants.map((participant) => (
-                                <li key={participant.id} className="mb-2">
-                                    {`${participant.name} (${participant.id.slice(0, 4)})`}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
 
                 <div className="flex justify-end space-x-4">
                     <button className="bg-gray-500 text-white px-4 py-2 rounded" onClick={onClose}>

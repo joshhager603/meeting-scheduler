@@ -53,6 +53,29 @@ export const CalendarProvider = ({ children }) => {
         });
     };
 
+   // Remove a participant from a meeting
+   const removeParticipantFromMeeting = (calendarId, meetingId, participantId) => {
+    setCalendars((prevCalendars) => {
+        const updatedCalendars = [...prevCalendars];
+
+        updatedCalendars.forEach((calendar) => {
+            if (calendar.id === calendarId) {
+                calendar.meetings.forEach((meeting) => {
+                    if (meeting.id === meetingId) {
+                        meeting.participants = meeting.participants.filter(
+                            (participant) => participant.id !== participantId
+                        );
+                    }
+                });
+            }
+        });
+
+        return updatedCalendars;
+    });
+};
+
+
+
     // Add a meeting
     const addMeeting = (calendarId, meeting) => {
         const newMeeting = {
@@ -74,7 +97,27 @@ export const CalendarProvider = ({ children }) => {
 
             return updatedCalendars;
         });
+
+        return newMeeting;
     };
+
+    // Remove a meeting from a calendar
+    const removeMeetingFromCalendar = (calendarId, meetingId) => {
+        setCalendars((prevCalendars) => {
+            const updatedCalendars = [...prevCalendars];
+
+            updatedCalendars.forEach((calendar) => {
+                if (calendar.id === calendarId) {
+                    calendar.meetings = calendar.meetings.filter(
+                        (meeting) => meeting.id !== meetingId
+                    );
+                }
+            });
+
+            return updatedCalendars;
+        });
+    };
+
 
     // Select a calendar for viewing
     const selectCalendar = (calendarId) => {
@@ -86,13 +129,15 @@ export const CalendarProvider = ({ children }) => {
         <CalendarContext.Provider
             value={{
                 calendars,
-                participants, // Provide the participant list
+                participants, 
                 selectedCalendar,
                 addCalendar,
                 selectCalendar,
                 addMeeting,
-                addParticipant, // Function to add participants independently
-                assignParticipantToMeeting, // Function to assign participants to meetings
+                addParticipant, 
+                assignParticipantToMeeting, 
+                removeParticipantFromMeeting, 
+                removeMeetingFromCalendar,
             }}
         >
             {children}
