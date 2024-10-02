@@ -1,1 +1,24 @@
-{"calendars": {"1": {"id": "b3430cfd-b186-41e9-9020-c9c52102e0e8", "title": "Dunder Mifflin Sales", "details": "Meeting calendar for sales team", "meetings": ["3358ba91-f427-48f9-97fc-7c0f5471791c"]}}, "meetings": {}, "participants": {}, "attachments": {}}
+{
+    "calendars": {
+        "1": {
+            "id": "ef031b38-a190-4c6f-85d3-27915754f966",
+            "title": "Dunder Mifflin Sales",
+            "details": "Meeting calendar for sales team",
+            "meetings": []
+        }
+    },
+    "meetings": {
+        "1": {
+            "id": "270092b6-ab92-4fab-a5d1-25d353441aab",
+            "title": "Monthly Sales Report",
+            "date_and_time": "2006-09-24 11:30 AM",
+            "location": "The Conference Room",
+            "details": "Meeting to report our monthly sales",
+            "calendars": [
+                "ef031b38-a190-4c6f-85d3-27915754f966"
+            ],
+            "participants": [],
+            "attachments": []
+        }
+    }
+}
