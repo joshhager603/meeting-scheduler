@@ -16,7 +16,7 @@ const App = () => {
                 <div className="container mx-auto p-4">
                     <Routes>
                         <Route path="/participants" element={<Participants />} />
-                        <Route path="/calendars" element={<Calendars />} />
+                        <Route path="/" element={<Calendars />} />
                         <Route path="/weeklyCalendar/:id" element={<WeeklyCalendar />} />
                         <Route path="/meeting/:id" element={<Meeting />} />
                     </Routes>

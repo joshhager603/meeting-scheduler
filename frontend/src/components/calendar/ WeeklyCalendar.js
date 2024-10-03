@@ -111,6 +111,21 @@ const WeeklyCalendar = () => {
                   <p>No participants for this meeting.</p>
                 )}
               </div>
+
+              <div className="mt-4">
+                <h4 className="font-bold mb-2">Attachments:</h4>
+                {meeting?.attachments?.length > 0 ? (
+                  <ul className="list-disc list-inside">
+                    {meeting.attachments.map((attachment, index) => (
+                      <li key={index} className="text-gray-700">
+                         <a target='_blank' href={`${attachment.url}`} className="text-blue-500">{attachment.url}</a>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>No participants for this meeting.</p>
+                )}
+              </div>
             </div>
           ))
         ) : (

@@ -58,21 +58,9 @@ export const CalendarProvider = ({ children }) => {
         // Fetch all calendars and populate meetings and participants
         const fetchCalendars = async () => {
             const result = await sendRequest({}, "GET", "calendars/");
-            console.log(result)
             if (result)
                 setCalendars(result)
         };
-
-
-    // Fetch all participants
-    const fetchParticipants = async () => {
-        const result = await sendRequest(null, "GET", "participants/");
-        if (result) {
-            setParticipants(result); // Update state with fetched participants
-        } else {
-            console.error("Failed to fetch participants");
-        }
-    };
 
 
     // Add a new calendar
@@ -179,6 +167,40 @@ export const CalendarProvider = ({ children }) => {
         setSelectedCalendar(calendar || null);
     };
 
+
+    // Add a new attachment
+    const addAttachment = async (url, meeting) => {
+        const newAttachment = {
+            url,
+            meeting,
+        };
+
+      await sendRequest(newAttachment, "POST", "attachments/");
+      fetchCalendars();
+    };
+
+    // Remove a Attachment
+    const removeAttachment = async (AttachmentId) => {
+        await sendRequest({}, "DELETE", `attachments/${AttachmentId}/`);
+        fetchCalendars();
+    };
+
+    // Update an existing Attachment
+    const updateAttachment = async (AttachmentId, url) => {
+        const updatedAttachment = {
+            url
+        };
+
+        await sendRequest(updatedAttachment, "PUT", `attachments/${AttachmentId}/`);
+        fetchCalendars();
+        
+    };
+
+    // Remove a Attachment from a meeting
+    const deleteAttachment = async(participantId) => {
+        await sendRequest({}, "DELETE", `participants/${participantId}/`)
+    };
+
     return (
         <CalendarContext.Provider
             value={{
@@ -197,6 +219,11 @@ export const CalendarProvider = ({ children }) => {
                 updateCalendar,
                 deleteParticipant,
                 fetchMeeting,
+                addAttachment,
+                removeAttachment,
+                updateAttachment,
+                deleteAttachment
+
             }}
         >
             {children}

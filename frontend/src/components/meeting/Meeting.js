@@ -4,10 +4,11 @@ import { useStateContext } from '../../context/CalendarContext';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import AddParticipantModal from '../participant/AddParticipantModal'; // Import the AddParticipantModal component
+import AttachmentModal from '../attachment/AttachmentModal';
 
 const Meeting = () => {
     const { id } = useParams(); // Get the meeting ID from the URL
-    const {removeParticipant, fetchMeeting, updateMeeting, calendars } = useStateContext();
+    const {removeParticipant, fetchMeeting, updateMeeting, calendars , removeAttachment} = useStateContext();
     const [meeting, setMeeting] = useState(null);
     const [title, setTitle] = useState('');
     const [location, setLocation] = useState('');
@@ -15,7 +16,9 @@ const Meeting = () => {
     const [date, setDate] = useState(new Date());
     const [time, setTime] = useState('');
     const [currentParticipants, setCurrentParticipants] = useState([]);
-    const [isParticipantModalVisible, setParticipantModalVisible] = useState(false); // For showing/hiding the modal
+    const [attachments, setAttachments] = useState([]);
+    const [isParticipantModalVisible, setParticipantModalVisible] = useState(false);
+    const [isAttachmentModalVisible, setAttachmentModalVisible] = useState(false);
     const navigate = useNavigate();
 
  // Load the meeting details when the component is mounted
@@ -30,6 +33,7 @@ const Meeting = () => {
                 setDate(new Date(foundMeeting.date));
                 setTime(foundMeeting.time);
                 setCurrentParticipants(foundMeeting.participants || []);
+                setAttachments(foundMeeting.attachments || [])
             }
         };
 
@@ -41,6 +45,10 @@ const Meeting = () => {
 
     const handleRemoveParticipant = async (participantId) => {
         await removeParticipant(participantId)
+    };
+
+    const handleRemoveAttachment = async (attachmentId) => {
+        await removeAttachment(attachmentId)
     };
 
     const handleUpdateMeeting = () => {
@@ -114,6 +122,33 @@ const Meeting = () => {
                 />
             </div>
 
+
+            <div className="mb-4">
+                <label className="block font-bold">Attachments:</label>
+                {attachments.map((attachment)=>(
+                    <li key={attachment.id} className="flex items-center mb-2">
+                    {`${attachment.url}`}
+                    <button
+                        className="ml-4 text-red-500 hover:text-red-700"
+                        onClick={() => handleRemoveAttachment(attachment.id)}
+                    >
+                        ✖
+                    </button>
+                </li>
+                ))}
+
+            <div className="flex items-center">
+
+            {/* Button to open modal to add a new participant */}
+            <button
+                className=" bg-blue-500 text-white py-2 rounded"
+                onClick={() => setAttachmentModalVisible(true)} // Open modal for adding a new participant
+            >
+            create new Attachment
+            </button>
+            </div>
+            </div>
+
             {/* Participant Assignment */}
             <div className="mt-6">
                 <h3 className="text-lg font-bold mb-2">Assign Participant:</h3>
@@ -162,6 +197,13 @@ const Meeting = () => {
                 onClose={() => setParticipantModalVisible(false)}
                 meetingId={meeting?.id}
             />
+
+            <AttachmentModal
+            show={isAttachmentModalVisible}
+            onClose={()=> setAttachmentModalVisible(false)}
+            meetingId = {meeting?.id}
+            />
+
         </div>
     );
 };
