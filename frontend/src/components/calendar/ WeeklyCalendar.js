@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
-import { useNavigate } from 'react-router-dom';  // Import useNavigate for navigation
+import { useNavigate, useParams } from 'react-router-dom';  // Import useNavigate for navigation
 import DatePicker from 'react-datepicker'; // Import DatePicker
 import 'react-datepicker/dist/react-datepicker.css'; // Import DatePicker styles
 import { FaTrashAlt } from 'react-icons/fa';  // Import trash icon
@@ -10,8 +10,19 @@ import { useStateContext } from '../../context/CalendarContext';
 const WeeklyCalendar = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [modalVisible, setModalVisible] = useState(false);
-  const { selectedCalendar, removeMeetingFromCalendar } = useStateContext(); // Import removeMeetingFromCalendar from context
+  const {calendars, removeMeeting } = useStateContext(); // Import removeMeetingFromCalendar from context
   const navigate = useNavigate();  // Initialize navigation hook
+  const[selectedCalendar, setSelectedCalendar] = useState(null)
+  const {id} = useParams();
+
+  useEffect(() => {
+    if (id && calendars.length > 0) {
+      const foundCalendar = calendars.find((calendar) => calendar.id === id);
+      if (foundCalendar) {
+        setSelectedCalendar(foundCalendar);  // Set the selected calendar
+      }
+    }
+  }, [id, calendars]);  // Re-run the effect if `id` or `calendars` change  
 
   // Filter and sort meetings for the selected day by time
   const selectedDayMeetings = selectedCalendar?.meetings
@@ -24,7 +35,7 @@ const WeeklyCalendar = () => {
 
   const handleDeleteMeeting = (meetingId) => {
     // Remove the meeting from the calendar
-    removeMeetingFromCalendar(selectedCalendar.id, meetingId);
+    removeMeeting(meetingId);
   };
 
   return (
@@ -110,8 +121,9 @@ const WeeklyCalendar = () => {
       {/* Render the MeetingModal */}
       <MeetingModal
         show={modalVisible}
-        onClose={() => setModalVisible(false)}  // Close the modal
-        date={selectedDate}  // Pass the selected date to the modal
+        onClose={() => setModalVisible(false)}  
+        date={selectedDate} 
+        calendarId={id}
       />
     </div>
   );

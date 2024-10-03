@@ -3,7 +3,7 @@ import DatePicker from 'react-datepicker'; // For time picker
 import 'react-datepicker/dist/react-datepicker.css';
 import { useStateContext } from '../../context/CalendarContext';
 
-const MeetingModal = ({ show, onClose, date }) => {
+const MeetingModal = ({ show, onClose, date, calendarId }) => {
   const [title, setTitle] = useState('');
   const [time, setTime] = useState(new Date());
   const [location, setLocation] = useState('');
@@ -11,7 +11,7 @@ const MeetingModal = ({ show, onClose, date }) => {
   const { addMeeting, selectedCalendar } = useStateContext();
 
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newMeeting = {
       title,
       date: date.toISOString().split('T')[0],  // Convert date to 'yyyy-MM-dd'
@@ -19,7 +19,7 @@ const MeetingModal = ({ show, onClose, date }) => {
       location,
       details,
     };
-    addMeeting(selectedCalendar.id, newMeeting);  
+    await addMeeting(calendarId, newMeeting);  
     onClose(); 
   };
 

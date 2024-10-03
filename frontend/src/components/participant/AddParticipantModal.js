@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useStateContext } from '../../context/CalendarContext';
 
-const AddParticipantModal = ({ show, onClose, participant }) => {
-    const { addParticipant, updateParticipant } = useStateContext();
+const AddParticipantModal = ({ show, onClose, participant, meetingId }) => {
+    const { addParticipant, updateParticipant, calendars } = useStateContext();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [errors, setErrors] = useState({ name: '', email: '' });
@@ -16,11 +16,11 @@ const AddParticipantModal = ({ show, onClose, participant }) => {
             setName('');
             setEmail('');
         }
-    }, [participant]);
+    }, [calendars, participant]);
 
     if (!show) return null;
 
-    const handleSubmit = () => {
+    const handleSubmit = async() => {
         let valid = true;
         const newErrors = { name: '', email: '' };
 
@@ -37,12 +37,11 @@ const AddParticipantModal = ({ show, onClose, participant }) => {
         if (valid) {
             if (participant) {
                 // Update existing participant
-                updateParticipant(participant.id, name, email);
+               await  updateParticipant(participant.id, name, email);
             } else {
                 // Add new participant
-                addParticipant(name, email);
+                await addParticipant(name, email, meetingId);
             }
-
             setName('');
             setEmail('');
             onClose(); // Close modal after saving
@@ -81,7 +80,7 @@ const AddParticipantModal = ({ show, onClose, participant }) => {
                         Cancel
                     </button>
                     <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={handleSubmit}>
-                        {participant ? 'Update' : 'Save'}
+                        {participant ? 'Update' : 'Add'}
                     </button>
                 </div>
             </div>

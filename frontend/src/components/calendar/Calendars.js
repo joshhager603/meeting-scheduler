@@ -21,8 +21,10 @@ const Calendars = () => {
 
     const handleSaveCalendar = (title, details) => {
         if (editCalendar) {
+            editCalendar.title = title;
+            editCalendar.details = details;
             // Update the existing calendar
-            updateCalendar(editCalendar.id, title, details);
+            updateCalendar(editCalendar);
         } else {
             // Add a new calendar
             addCalendar(title, details);

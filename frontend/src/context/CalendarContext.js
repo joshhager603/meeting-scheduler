@@ -1,184 +1,177 @@
-import React, { createContext, useContext, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 // Create a context for calendars
 export const CalendarContext = createContext();
+
+const api_uri = 'http://127.0.0.1:8000/api/';
 
 export const CalendarProvider = ({ children }) => {
     const [calendars, setCalendars] = useState([]);
     const [participants, setParticipants] = useState([]); 
     const [selectedCalendar, setSelectedCalendar] = useState(null);
 
+      // UseEffect to fetch calendars and participants when component mounts
+      useEffect(() => {
+        fetchCalendars();
+    }, []); 
+
+    const sendRequest = async (data, method, endpoint = "calendars/") => {
+        try {
+            const options = {
+                method: method,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            };
+    
+            // Only include body for POST and PUT requests
+            if (method === "POST" || method === "PUT") {
+                options.body = JSON.stringify(data);
+            }
+    
+            const response = await fetch(`${api_uri}${endpoint}`, options);
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+    
+            // Check if response has a body (DELETE requests often don't)
+            if (method !== "DELETE") {
+                const result = await response.json(); // Try parsing as JSON
+                return result;
+            } else {
+                return {}; // Return an empty object for DELETE requests
+            }
+        } catch (error) {
+            console.error("There was a problem with the fetch operation:", error);
+            return null; // Return null in case of error
+        }
+    };
+
+
+            // Function to fetch a specific meeting by ID
+        const fetchMeeting = async (meetingId) => {
+            const meeting = await sendRequest({}, "GET", `meetings/${meetingId}/`);
+            return meeting;
+        };
+
+        // Fetch all calendars and populate meetings and participants
+        const fetchCalendars = async () => {
+            const result = await sendRequest({}, "GET", "calendars/");
+            console.log(result)
+            if (result)
+                setCalendars(result)
+        };
+
+
+    // Fetch all participants
+    const fetchParticipants = async () => {
+        const result = await sendRequest(null, "GET", "participants/");
+        if (result) {
+            setParticipants(result); // Update state with fetched participants
+        } else {
+            console.error("Failed to fetch participants");
+        }
+    };
+
+
     // Add a new calendar
-    const addCalendar = (title, details) => {
+    const addCalendar = async (title, details) => {
         const newCalendar = {
-            id: uuidv4(),
             title,
             details,
             meetings: [],
         };
-        setCalendars((prevCalendars) => [...prevCalendars, newCalendar]);
+
+        const result = await sendRequest(newCalendar, "POST");
+        if (result) {
+            setCalendars((prevCalendars) => [...prevCalendars, result]); // Use the result from the API
+        } else {
+            alert("Failed to add calendar");
+        }
     };
 
-    // Update an existing calendar
-    const updateCalendar = (calendarId, title, details) => {
-        setCalendars((prevCalendars) =>
-            prevCalendars.map((calendar) =>
-                calendar.id === calendarId ? { ...calendar, title, details } : calendar
-            )
-        );
+    // Update an existing calendar by passing the updated calendar object
+    const updateCalendar = async (updatedCalendar) => {
+        const result = await sendRequest(updatedCalendar, "PUT", `calendars/${updatedCalendar.id}/`);
+        if (result) {
+            await fetchCalendars(); // Fetch all calendars again after updating
+        } else {
+            alert("Failed to update calendar");
+        }
     };
+
 
     // Remove a calendar
-    const removeCalendar = (calendarId) => {
-        setCalendars((prevCalendars) => prevCalendars.filter(calendar => calendar.id !== calendarId));
-        setSelectedCalendar(null); // Clear selected calendar if it's the one being deleted
+    const removeCalendar = async (calendarId) => {
+        await sendRequest({}, "DELETE", `calendars/${calendarId}/`);
+        await fetchCalendars();
     };
 
     // Add a new participant
-    const addParticipant = (name, email) => {
+    const addParticipant = async (name, email, meeting) => {
         const newParticipant = {
-            id: uuidv4(),
             name,
             email,
+            meeting,
         };
 
-        setParticipants((prevParticipants) => [...prevParticipants, newParticipant]);
+     const result =  await sendRequest(newParticipant, "POST", "participants/");
+      fetchCalendars();
     };
 
-     // Remove a participant
-     const removeParticipant = (participantId) => {
-        setParticipants((prevParticipants) => prevParticipants.filter(participant => participant.id !== participantId));
+    // Remove a participant
+    const removeParticipant = async (participantId) => {
+        await sendRequest({}, "DELETE", `participants/${participantId}/`);
+        fetchCalendars();
     };
 
-      // Update an existing participant
-      const updateParticipant = (participantId, name, email) => {
-        setParticipants((prevParticipants) =>
-            prevParticipants.map((participant) =>
-                participant.id === participantId ? { ...participant, name, email } : participant
-            )
-        );
+    // Update an existing participant
+    const updateParticipant = async (participantId, name, email) => {
+        const updatedParticipant = {
+            name,
+            email
+        };
+
+        await sendRequest(updatedParticipant, "PUT", `participants/${participantId}/`);
+        fetchCalendars();
+        
     };
 
-    // Add participant to a meeting
-    const assignParticipantToMeeting = (calendarId, meetingId, participantId) => {
-        setCalendars((prevCalendars) => {
-            const updatedCalendars = [...prevCalendars];
-
-            updatedCalendars.forEach((calendar) => {
-                if (calendar.id === calendarId) {
-                    calendar.meetings.forEach((meeting) => {
-                        if (meeting.id === meetingId) {
-                            const participant = participants.find(p => p.id === participantId);
-                            if (participant && !meeting.participants.includes(participant)) {
-                                meeting.participants.push(participant); // Add the participant to the meeting
-                            }
-                        }
-                    });
-                }
-            });
-
-            return updatedCalendars;
-        });
+    // Remove a participant from a meeting
+    const deleteParticipant = async(participantId) => {
+        await sendRequest({}, "DELETE", `participants/${participantId}/`)
     };
 
-   // Remove a participant from a meeting
-   const removeParticipantFromMeeting = (calendarId, meetingId, participantId) => {
-    setCalendars((prevCalendars) => {
-        const updatedCalendars = [...prevCalendars];
-
-        updatedCalendars.forEach((calendar) => {
-            if (calendar.id === calendarId) {
-                calendar.meetings.forEach((meeting) => {
-                    if (meeting.id === meetingId) {
-                        meeting.participants = meeting.participants.filter(
-                            (participant) => participant.id !== participantId
-                        );
-                    }
-                });
-            }
-        });
-
-        return updatedCalendars;
-    });
-};
-
-
-
-    // Add a meeting
-    const addMeeting = (calendarId, meeting) => {
+   // Add a meeting and update the corresponding calendar
+    const addMeeting = async (calendarId, meeting) => {
         const newMeeting = {
-            id: uuidv4(),
             title: meeting.title,
             details: meeting.details,
             date: meeting.date,
             time: meeting.time,
-            participants: meeting.participants || [], 
-            location: meeting.location
-
+            location: meeting.location,
+            calendar: calendarId
         };
 
-        setCalendars((prevCalendars) => {
-            const updatedCalendars = [...prevCalendars];
-            updatedCalendars.forEach((calendar) => {
-                if (calendar.id === calendarId) {
-                    calendar.meetings.push(newMeeting);
-                }
-            });
-
-            return updatedCalendars;
-        });
-
-        return newMeeting;
+        // Step 1: Create the meeting
+        await sendRequest(newMeeting, "POST", `meetings/`);
+        fetchCalendars()
     };
 
-    // Update an existing meeting
-const updateMeeting = (calendarId, meeting) => {
-    setCalendars((prevCalendars) => {
-        const updatedCalendars = [...prevCalendars];
+        // Update an existing meeting
+        const updateMeeting = async (meeting) => {
+            await sendRequest(meeting, "PUT", `meetings/${meeting.id}/`);
+            fetchCalendars();
+    
+        };
 
-        updatedCalendars.forEach((calendar) => {
-            if (calendar.id === calendarId) {
-                const existingMeetingIndex = calendar.meetings.findIndex(
-                    (m) => m.id === meeting.id
-                );
-
-                if (existingMeetingIndex !== -1) {
-                    // Update the existing meeting's details
-                    calendar.meetings[existingMeetingIndex] = {
-                        ...calendar.meetings[existingMeetingIndex],
-                        title: meeting.title,
-                        details: meeting.details,
-                        date: meeting.date,
-                        time: meeting.time,
-                        participants: meeting.participants || [],
-                        location: meeting.location,
-                    };
-                }
-            }
-        });
-
-        return updatedCalendars;
-    });
-};
 
     // Remove a meeting from a calendar
-    const removeMeetingFromCalendar = (calendarId, meetingId) => {
-        setCalendars((prevCalendars) => {
-            const updatedCalendars = [...prevCalendars];
-
-            updatedCalendars.forEach((calendar) => {
-                if (calendar.id === calendarId) {
-                    calendar.meetings = calendar.meetings.filter(
-                        (meeting) => meeting.id !== meetingId
-                    );
-                }
-            });
-
-            return updatedCalendars;
-        });
+    const removeMeeting = async (meetingId) => {
+        await sendRequest({}, "DELETE", `meetings/${meetingId}/`);
+        fetchCalendars()
     };
-
 
     // Select a calendar for viewing
     const selectCalendar = (calendarId) => {
@@ -197,13 +190,13 @@ const updateMeeting = (calendarId, meeting) => {
                 selectCalendar,
                 addMeeting,
                 addParticipant, 
-                assignParticipantToMeeting, 
-                removeParticipantFromMeeting, 
-                removeMeetingFromCalendar,
+                removeMeeting,
                 updateMeeting,
                 removeParticipant,
                 updateParticipant,
                 updateCalendar,
+                deleteParticipant,
+                fetchMeeting,
             }}
         >
             {children}
