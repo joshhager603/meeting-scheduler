@@ -7,7 +7,7 @@ import { FaTrashAlt } from 'react-icons/fa';  // Import trash icon
 import MeetingModal from '../meeting/MeetingModal'; // Import the MeetingModal component
 import { useStateContext } from '../../context/CalendarContext';
 
-const WeeklyCalendar = () => {
+const DailyCalendar = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [modalVisible, setModalVisible] = useState(false);
   const {calendars, removeMeeting } = useStateContext(); // Import removeMeetingFromCalendar from context
@@ -144,4 +144,4 @@ const WeeklyCalendar = () => {
   );
 };
 
-export default WeeklyCalendar;
+export default DailyCalendar;

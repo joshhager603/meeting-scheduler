@@ -35,8 +35,8 @@ const Calendars = () => {
     const handleSelectCalendar = (calendarId) => {
         // Set the selected calendar
         selectCalendar(calendarId);
-        // Navigate to the weekly calendar page with the calendar ID
-        navigate(`/weeklyCalendar/${calendarId}`);
+        // Navigate to the daily calendar page with the calendar ID
+        navigate(`/dailyCalendar/${calendarId}`);
     };
 
     const handleDeleteCalendar = (calendarId) => {
@@ -66,7 +66,7 @@ const Calendars = () => {
                 <div className="grid grid-cols-2 gap-4">
                     {calendars.map((calendar) => (
                         <div key={calendar.id} className="relative bg-green-800 text-white p-4 rounded-lg shadow-md flex justify-between items-center">
-                            {/* Calendar Title - Click to navigate to weekly calendar */}
+                            {/* Calendar Title - Click to navigate to daily calendar */}
                             <div
                                 className="cursor-pointer flex-1"
                                 onClick={() => handleSelectCalendar(calendar.id)} // Navigate with ID
