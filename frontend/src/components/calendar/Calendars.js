@@ -2,14 +2,17 @@ import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CalendarContext } from '../../context/CalendarContext';
 import CalendarModal from './CalendarModal';
+import { FaTrashAlt, FaEdit } from 'react-icons/fa'; // Import the trash and edit icons
 
 const Calendars = () => {
-    const { calendars, addCalendar, selectCalendar} = useContext(CalendarContext);
+    const { calendars, addCalendar, updateCalendar, selectCalendar, removeCalendar } = useContext(CalendarContext); // Include updateCalendar
     const [calendarModalVisible, setCalendarModalVisible] = useState(false);
+    const [editCalendar, setEditCalendar] = useState(null); // Track the calendar to be edited
     const navigate = useNavigate();
 
     const openCalendarModal = () => {
         setCalendarModalVisible(true);
+        setEditCalendar(null); // Reset the edit calendar to null for adding a new calendar
     };
 
     const closeCalendarModal = () => {
@@ -17,16 +20,33 @@ const Calendars = () => {
     };
 
     const handleSaveCalendar = (title, details) => {
-        addCalendar(title, details);
+        if (editCalendar) {
+            editCalendar.title = title;
+            editCalendar.details = details;
+            // Update the existing calendar
+            updateCalendar(editCalendar);
+        } else {
+            // Add a new calendar
+            addCalendar(title, details);
+        }
         closeCalendarModal();
     };
 
     const handleSelectCalendar = (calendarId) => {
-        //set the calendar
+        // Set the selected calendar
         selectCalendar(calendarId);
-        
-        // Navigate to the weekly calendar page with the calendar ID
-        navigate(`/weeklyCalendar/${calendarId}`);
+        // Navigate to the daily calendar page with the calendar ID
+        navigate(`/dailyCalendar/${calendarId}`);
+    };
+
+    const handleDeleteCalendar = (calendarId) => {
+        // Remove the calendar using the context function
+        removeCalendar(calendarId);
+    };
+
+    const handleEditCalendar = (calendar) => {
+        setEditCalendar(calendar); // Set the calendar to be edited
+        setCalendarModalVisible(true); // Open the modal in edit mode
     };
 
     return (
@@ -45,13 +65,40 @@ const Calendars = () => {
             {calendars.length > 0 ? (
                 <div className="grid grid-cols-2 gap-4">
                     {calendars.map((calendar) => (
-                        <button
-                            key={calendar.id}
-                            className="bg-green-800 text-white p-4 rounded-lg"
-                            onClick={() => handleSelectCalendar(calendar.id)} // Navigate with ID
-                        >
-                            {calendar.title}
-                        </button>
+                        <div key={calendar.id} className="relative bg-green-800 text-white p-4 rounded-lg shadow-md flex justify-between items-center">
+                            {/* Calendar Title - Click to navigate to daily calendar */}
+                            <div
+                                className="cursor-pointer flex-1"
+                                onClick={() => handleSelectCalendar(calendar.id)} // Navigate with ID
+                            >
+                                {calendar.title}
+                            </div>
+
+                            {/* Edit and Delete Buttons */}
+                            <div className="flex space-x-2">
+                                {/* Edit Calendar Button */}
+                                <button
+                                    className="text-blue-500 hover:text-blue-700"
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // Prevent navigation
+                                        handleEditCalendar(calendar); // Open modal for editing
+                                    }}
+                                >
+                                    <FaEdit size={18} />
+                                </button>
+
+                                {/* Delete Calendar Button */}
+                                <button
+                                    className="text-red-500 hover:text-red-700"
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // Prevent the click event from navigating to the calendar
+                                        handleDeleteCalendar(calendar.id);
+                                    }}
+                                >
+                                    <FaTrashAlt size={18} />
+                                </button>
+                            </div>
+                        </div>
                     ))}
                 </div>
             ) : (
@@ -65,6 +112,7 @@ const Calendars = () => {
                 show={calendarModalVisible}
                 onClose={closeCalendarModal}
                 onSave={handleSaveCalendar}
+                calendar={editCalendar} // Pass the calendar to be edited to the modal
             />
         </div>
     );

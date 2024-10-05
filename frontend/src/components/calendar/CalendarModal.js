@@ -1,43 +1,32 @@
-import React, { useContext, useState } from 'react';
-import { useStateContext } from '../../context/CalendarContext';
+import React, { useState, useEffect } from 'react';
 
-const CalendarModal = ({ show, onClose}) => {
+const CalendarModal = ({ show, onClose, onSave, calendar }) => {
     const [title, setTitle] = useState('');
     const [details, setDetails] = useState('');
-    const [errors, setErrors] = useState({ title: '', details: '' });
-    const {selectCalendar, addCalendar } = useStateContext();
+
+    useEffect(() => {
+        if (calendar) {
+            // Pre-fill the modal with the calendar's current data when editing
+            setTitle(calendar.title);
+            setDetails(calendar.details);
+        } else {
+            setTitle('');
+            setDetails('');
+        }
+    }, [calendar]);
 
     if (!show) return null;
 
-    const validateForm = () => {
-        let valid = true;
-        const newErrors = { title: '', details: '' };
-
-        if (title.trim() === '') {
-            newErrors.title = 'Title is required.';
-            valid = false;
-        }
-
-        if (details.trim() === '') {
-            newErrors.details = 'Details are required.';
-            valid = false;
-        }
-
-        setErrors(newErrors);
-        return valid;
-    };
-
     const handleSubmit = () => {
-        if (validateForm()) {
-            addCalendar(title, details);
-            onClose();
+        if (title.trim() && details.trim()) {
+            onSave(title, details);
         }
     };
 
     return (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
             <div className="bg-white p-6 rounded-lg">
-                <h2 className="text-xl font-bold mb-4">Create Calendar</h2>
+                <h2 className="text-xl font-bold mb-4">{calendar ? 'Edit Calendar' : 'Add Calendar'}</h2>
 
                 <div className="mb-4">
                     <label className="block font-bold">Title:</label>
@@ -46,9 +35,6 @@ const CalendarModal = ({ show, onClose}) => {
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                     />
-                    {errors.title && (
-                        <p className="text-red-500 text-sm mt-1">{errors.title}</p>
-                    )}
                 </div>
 
                 <div className="mb-4">
@@ -58,9 +44,6 @@ const CalendarModal = ({ show, onClose}) => {
                         value={details}
                         onChange={(e) => setDetails(e.target.value)}
                     />
-                    {errors.details && (
-                        <p className="text-red-500 text-sm mt-1">{errors.details}</p>
-                    )}
                 </div>
 
                 <div className="flex justify-end space-x-4">
@@ -68,7 +51,7 @@ const CalendarModal = ({ show, onClose}) => {
                         Cancel
                     </button>
                     <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={handleSubmit}>
-                        Save
+                        {calendar ? 'Update' : 'Save'}
                     </button>
                 </div>
             </div>

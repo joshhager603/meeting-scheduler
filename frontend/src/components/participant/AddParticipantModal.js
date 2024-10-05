@@ -1,15 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStateContext } from '../../context/CalendarContext';
 
-const AddParticipantModal = ({ show, onClose }) => {
-    const { addParticipant } = useStateContext();
+const AddParticipantModal = ({ show, onClose, participant, meetingId }) => {
+    const { addParticipant, updateParticipant, calendars } = useStateContext();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [errors, setErrors] = useState({ name: '', email: '' });
 
+    useEffect(() => {
+        if (participant) {
+            // Pre-fill the modal with the participant's current data when editing
+            setName(participant.name);
+            setEmail(participant.email);
+        } else {
+            setName('');
+            setEmail('');
+        }
+    }, [calendars, participant]);
+
     if (!show) return null;
 
-    const handleSubmit = () => {
+    const handleSubmit = async() => {
         let valid = true;
         const newErrors = { name: '', email: '' };
 
@@ -24,7 +35,13 @@ const AddParticipantModal = ({ show, onClose }) => {
         }
 
         if (valid) {
-            addParticipant(name, email);
+            if (participant) {
+                // Update existing participant
+               await  updateParticipant(participant.id, name, email);
+            } else {
+                // Add new participant
+                await addParticipant(name, email, meetingId);
+            }
             setName('');
             setEmail('');
             onClose(); // Close modal after saving
@@ -36,7 +53,7 @@ const AddParticipantModal = ({ show, onClose }) => {
     return (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
             <div className="bg-white p-6 rounded-lg">
-                <h2 className="text-xl font-bold mb-4">Add Participant</h2>
+                <h2 className="text-xl font-bold mb-4">{participant ? 'Edit Participant' : 'Add Participant'}</h2>
 
                 <div className="mb-4">
                     <label className="block font-bold">Name:</label>
@@ -63,7 +80,7 @@ const AddParticipantModal = ({ show, onClose }) => {
                         Cancel
                     </button>
                     <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={handleSubmit}>
-                        Save
+                        {participant ? 'Update' : 'Add'}
                     </button>
                 </div>
             </div>
