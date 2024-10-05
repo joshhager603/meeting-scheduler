@@ -56,6 +56,17 @@ The backend machine should have both Python and pip installed as a prerequisite.
     ```
 
 4. Modify the `.env` file
+    DJANGO_KEY = <django-key>
+    MYSQL_USER = <MySQL username e.g.: root>
+    MYSQL_PW = <MySQL password e.g.: joosh123>
+    DB_IP = <IP address of machine running MySQL>
+    SERVER_IP = <IP address of machine running backend>
+
+5. Access the backend directory and start a server
+
+    ```bash
+    python manage.py runserver <IP address of machine running backend>
+    ```
 
 ### Frontend Machine Setup
 

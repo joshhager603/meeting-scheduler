@@ -12,7 +12,7 @@ class Calendars(models.Model):
 
 class Meetings(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    calendar = models.ForeignKey(Calendars, on_delete=models.CASCADE, related_name='meetings')
+    calendar_id = models.ForeignKey(Calendars, on_delete=models.CASCADE, related_name='meetings')
     title = models.CharField(max_length=100)
     date = models.DateField()
     time = models.TimeField()
@@ -25,7 +25,7 @@ class Meetings(models.Model):
 
 class Participants(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    meeting = models.ForeignKey(Meetings, on_delete=models.CASCADE, related_name='participants')
+    meeting_id = models.ForeignKey(Meetings, on_delete=models.CASCADE, related_name='participants')
     name = models.CharField(max_length=600)
     email = models.EmailField()
 
@@ -35,7 +35,7 @@ class Participants(models.Model):
 
 class Attachments(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    meeting = models.ForeignKey(Meetings, on_delete=models.CASCADE, related_name='attachments')
+    meeting_id = models.ForeignKey(Meetings, on_delete=models.CASCADE, related_name='attachments')
     url = models.URLField()
 
     def __str__(self):

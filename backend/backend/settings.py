@@ -29,8 +29,9 @@ SECRET_KEY = os.getenv('DJANGO_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [os.getenv('SERVER_IP'), '127.0.0.1', '172.20.107.243']
 
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Application definition
 
@@ -86,8 +87,8 @@ DATABASES = {
         'NAME': 'meeting_scheduler',
         'USER': os.getenv('MYSQL_USER'),
         'PASSWORD': os.getenv('MYSQL_PW'),
-        'HOST': 'localhost',
-        'PORT': '33060',
+        'HOST': os.getenv('DB_IP'),
+        'PORT': '3306',
     }
 }
 
