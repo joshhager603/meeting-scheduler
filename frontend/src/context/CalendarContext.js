@@ -3,7 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 // Create a context for calendars
 export const CalendarContext = createContext();
 
-const api_uri = 'http://127.0.0.1:8000/api/';
+const api_uri = 'http://172.20.172.16:8000/api/';
 
 export const CalendarProvider = ({ children }) => {
     const [calendars, setCalendars] = useState([]);
@@ -139,7 +139,7 @@ export const CalendarProvider = ({ children }) => {
             date: meeting.date,
             time: meeting.time,
             location: meeting.location,
-            calendar: calendarId
+            calendar_id: calendarId
         };
 
         // Step 1: Create the meeting
