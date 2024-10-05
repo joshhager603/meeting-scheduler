@@ -97,11 +97,11 @@ export const CalendarProvider = ({ children }) => {
     };
 
     // Add a new participant
-    const addParticipant = async (name, email, meeting) => {
+    const addParticipant = async (name, email, meeting_id) => {
         const newParticipant = {
             name,
             email,
-            meeting,
+            meeting_id,
         };
 
      const result =  await sendRequest(newParticipant, "POST", "participants/");
@@ -169,10 +169,10 @@ export const CalendarProvider = ({ children }) => {
 
 
     // Add a new attachment
-    const addAttachment = async (url, meeting) => {
+    const addAttachment = async (url, meeting_id) => {
         const newAttachment = {
             url,
-            meeting,
+            meeting_id,
         };
 
       await sendRequest(newAttachment, "POST", "attachments/");

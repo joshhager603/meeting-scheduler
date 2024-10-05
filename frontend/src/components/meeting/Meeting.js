@@ -63,7 +63,7 @@ const Meeting = () => {
         };
 
         updateMeeting(updatedMeeting);
-        navigate(`/dailyCalendar/${meeting.calendar}`);
+        navigate(`/dailyCalendar/${meeting.calendar_id}`);
     };
 
     if (!meeting) {
