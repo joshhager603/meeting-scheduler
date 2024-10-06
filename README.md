@@ -68,13 +68,38 @@ The backend machine should have both Python and pip installed as a prerequisite.
     python manage.py runserver <IP address of machine running backend>
     ```
 
-### Frontend Machine Setup
 
-The frontend machine should have Node.js and React.js installed as a prerequisite.
+
+## Frontend Machine Setup
+
+The frontend machine should have Node.js and React.js installed as prerequisites.
+
+### Steps to Set Up:
 
 1. First, clone the repository to your local machine:
+   ```bash
+   git clone https://github.com/joshhager603/meeting-scheduler.git
+   cd meeting-scheduler
+   ```
 
-    ```bash
-    git clone https://github.com/joshhager603/meeting-scheduler.git
-    cd meeting-scheduler
-    ```
+2. After cloning, navigate to the frontend folder:
+   ```bash
+   cd frontend
+   ```
+
+3. Install the required packages by running:
+   ```bash
+   npm install
+   ```
+
+4. Once the packages are installed, go to the `context/CalendarContext.js` file.
+
+5. In `CalendarContext.js`, replace the `api_uri` with the `api_uri` you obtained from the backend services server (your local API URL).
+
+6. After updating the `api_uri`, start the frontend server:
+   ```bash
+   npm run start
+   ```
+
+   This will start the application on `localhost:3000` or any other available port, depending on your system's configuration.
+
