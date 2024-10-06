@@ -59,22 +59,32 @@ The backend machine should have both Python and pip installed as a prerequisite.
     DJANGO_KEY = <django-key>
     MYSQL_USER = <MySQL username e.g.: root>
     MYSQL_PW = <MySQL password e.g.: joosh123>
-    DB_IP = <IP address of machine running MySQL>
-    SERVER_IP = <IP address of machine running backend>
+    DB_IP = <IP address of machine running database (MySQL)>
+    SERVER_IP = <IP address of machine running backend (Django)>
+    PRESENTATION_IP = <IP address of machine running frontend (React.js)>
 
-5. Access the backend directory and start a server
+STEPS 5 & 6 DONE FROM '/backend' FOLDER
+
+5. Migrate to MySQL to set up tables from Django models
+    ```bash
+    python manage.py makemigrations
+    python manage.py migrate
+    ```
+
+
+6. Access the backend directory and start a server
 
     ```bash
-    python manage.py runserver <IP address of machine running backend>
+    python manage.py runserver <IP address of machine running backend>:<PORT NUMBER e.g. 8000>
     ```
 
 
 
-## Frontend Machine Setup
+### Frontend Machine Setup
 
 The frontend machine should have Node.js and React.js installed as prerequisites.
 
-### Steps to Set Up:
+**Steps to Set Up:**
 
 1. First, clone the repository to your local machine:
    ```bash
