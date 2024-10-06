@@ -33,8 +33,6 @@ const Calendars = () => {
     };
 
     const handleSelectCalendar = (calendarId) => {
-        // Set the selected calendar
-        selectCalendar(calendarId);
         // Navigate to the daily calendar page with the calendar ID
         navigate(`/dailyCalendar/${calendarId}`);
     };

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import DatePicker from 'react-datepicker'; // For time picker
 import 'react-datepicker/dist/react-datepicker.css';
 import { useStateContext } from '../../context/CalendarContext';
+import { format } from 'date-fns';
 
 const MeetingModal = ({ show, onClose, date, calendarId }) => {
   const [title, setTitle] = useState('');
@@ -14,11 +15,12 @@ const MeetingModal = ({ show, onClose, date, calendarId }) => {
   const handleSubmit = async () => {
     const newMeeting = {
       title,
-      date: date.toISOString().split('T')[0],  // Convert date to 'yyyy-MM-dd'
+      date: format(date, 'yyyy-MM-dd'), // Convert date to 'yyyy-MM-dd'
       time: time.toTimeString().split(' ')[0], // Convert time to 'HH:mm:ss'
       location,
       details,
     };
+    console.log("meeting to be created ", newMeeting);
     await addMeeting(calendarId, newMeeting);  
     onClose(); 
   };

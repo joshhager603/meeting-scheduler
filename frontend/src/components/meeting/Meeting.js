@@ -5,6 +5,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import AddParticipantModal from '../participant/AddParticipantModal'; // Import the AddParticipantModal component
 import AttachmentModal from '../attachment/AttachmentModal';
+import {format} from "date-fns";
 
 const Meeting = () => {
     const { id } = useParams(); // Get the meeting ID from the URL
@@ -30,7 +31,9 @@ const Meeting = () => {
                 setTitle(foundMeeting.title);
                 setLocation(foundMeeting.location);
                 setDetails(foundMeeting.details);
-                setDate(new Date(foundMeeting.date));
+                // Adjust for timezone by setting the date based on local timezone
+                const localDate = new Date(foundMeeting.date + 'T00:00:00');  // Force local time zone interpretation
+                setDate(localDate);
                 setTime(foundMeeting.time);
                 setCurrentParticipants(foundMeeting.participants || []);
                 setAttachments(foundMeeting.attachments || [])
@@ -57,7 +60,7 @@ const Meeting = () => {
             title,
             location,
             details,
-            date: date.toISOString().split('T')[0], // Format date to 'YYYY-MM-DD'
+            date: format(date, 'yyyy-MM-dd'),  // Format date to 'YYYY-MM-DD'
             time,
             participants: currentParticipants,
         };
