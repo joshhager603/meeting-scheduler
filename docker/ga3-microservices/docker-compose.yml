@@ -1,0 +1,53 @@
+# https://docs.docker.com/desktop/networking/#per-container-ip-addressing-is-not-possible
+
+services:
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: joosh123
+      MYSQL_DATABASE: meeting_scheduler
+      MYSQL_USER: calvinator
+      MYSQL_PASSWORD: calvin123
+    networks:
+      meeting_scheduler:
+        ipv4_address: 10.5.142.2
+    volumes:
+      - mysql_data:/data/db
+    ports:
+      - "3306:3306"
+
+  service:
+    build: ./service
+    depends_on:
+      - mysql
+    networks:
+      meeting_scheduler:
+        ipv4_address: 10.5.142.3
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=mysql
+      - DB_NAME=meeting_scheduler
+      - DB_USER=calvinator
+      - DB_PASSWORD=calvin123
+    tty: true
+
+  presentation:
+    build: ./presentation
+    depends_on:
+      - service
+    networks:
+      meeting_scheduler:
+        ipv4_address: 10.5.142.4
+    ports:
+      - "3000:3000"
+
+networks:
+  meeting_scheduler:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.142.0/24
+
+volumes:
+  mysql_data:

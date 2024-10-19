@@ -4,3 +4,4 @@ db.json
 venv
 .env
 env
+.DS_Store
