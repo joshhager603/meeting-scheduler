@@ -86,7 +86,7 @@ This file contains network information on the Docker containers used in this pro
 
     **Image:** Vanilla Python
 
-    **IP and Port inside Docker Net:** ``10.5.142.12:3001`
+    **IP and Port inside Docker Net:** `10.5.142.12:3001`
 
     **IP and Port from Host Machine:** `localhost:3001`
 
