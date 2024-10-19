@@ -24,6 +24,6 @@ COPY . /cli-presentation/
 # Expose the port python will run on
 EXPOSE 3001
 
-# Use wait-for-it to ensure MySQL is ready before starting Django
+# Use wait-for-it to ensure api gateway is ready
 CMD ["/wait-for-it.sh", "api-gateway:8000", "--", "bash", "startup.sh"]
 
