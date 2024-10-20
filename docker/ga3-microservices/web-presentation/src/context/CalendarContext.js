@@ -73,7 +73,7 @@ export const CalendarProvider = ({ children }) => {
 
         const result = await sendRequest(newCalendar, "POST");
         if (result) {
-            setCalendars((prevCalendars) => [...prevCalendars, result]); // Use the result from the API
+           await fetchCalendars();
         } else {
             alert("Failed to add calendar");
         }
@@ -105,13 +105,13 @@ export const CalendarProvider = ({ children }) => {
         };
 
      const result =  await sendRequest(newParticipant, "POST", "participants/");
-      fetchCalendars();
+     await fetchCalendars();
     };
 
     // Remove a participant
     const removeParticipant = async (participantId) => {
         await sendRequest({}, "DELETE", `participants/${participantId}/`);
-        fetchCalendars();
+       await  fetchCalendars();
     };
 
     // Update an existing participant
@@ -176,7 +176,7 @@ export const CalendarProvider = ({ children }) => {
         };
 
       await sendRequest(newAttachment, "POST", "attachments/");
-      fetchCalendars();
+      await fetchCalendars();
     };
 
     // Remove a Attachment
