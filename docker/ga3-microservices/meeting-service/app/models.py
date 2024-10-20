@@ -1,9 +1,9 @@
 from django.db import models
 import uuid
 
-# Create your models here.
 class Meetings(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    calendar_id = models.UUIDField()  # UUID of the related calendar
     title = models.CharField(max_length=100)
     date = models.DateField()
     time = models.TimeField()
