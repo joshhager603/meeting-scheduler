@@ -1,8 +1,8 @@
 import click
 import requests
 
-API_URI = 'http://localhost:8000/api/'
-#API_URI = 'api-gateway:8000/api'
+#API_URI = 'http://localhost:8000/api/'
+API_URI = 'http://api-gateway:8000/api/'
 
 # --- Utility function to send API requests ---
 def send_request(endpoint, method='GET', data=None):
