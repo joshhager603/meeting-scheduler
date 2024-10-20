@@ -1,0 +1,172 @@
+# https://docs.docker.com/desktop/networking/#per-container-ip-addressing-is-not-possible
+
+services:
+
+  calendarDB:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: joosh123
+      MYSQL_DATABASE: meeting_scheduler
+      MYSQL_USER: calvinator
+      MYSQL_PASSWORD: calvin123
+    networks:
+      meeting_scheduler:
+        ipv4_address: 10.5.142.2
+    volumes:
+      - mysql_data:/data/calendars
+    ports:
+      - "3306:3306"
+
+  meetingDB:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: joosh123
+      MYSQL_DATABASE: meeting_scheduler
+      MYSQL_USER: calvinator
+      MYSQL_PASSWORD: calvin123
+    networks:
+      meeting_scheduler:
+        ipv4_address: 10.5.142.3
+    volumes:
+      - mysql_data:/data/meetings
+    ports:
+      - "3307:3307"
+
+  participantDB:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: joosh123
+      MYSQL_DATABASE: meeting_scheduler
+      MYSQL_USER: calvinator
+      MYSQL_PASSWORD: calvin123
+    networks:
+      meeting_scheduler:
+        ipv4_address: 10.5.142.4
+    volumes:
+      - mysql_data:/data/participants
+    ports:
+      - "3308:3308"
+
+  attachmentDB:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: joosh123
+      MYSQL_DATABASE: meeting_scheduler
+      MYSQL_USER: calvinator
+      MYSQL_PASSWORD: calvin123
+    networks:
+      meeting_scheduler:
+        ipv4_address: 10.5.142.5
+    volumes:
+      - mysql_data:/data/attachments
+    ports:
+      - "3309:3309"
+
+  calendar-service:
+    build: ./calendar-service
+    depends_on:
+      - calendarDB
+    networks:
+      meeting_scheduler:
+        ipv4_address: 10.5.142.6
+    ports:
+      - "8001:8001"
+    environment:
+      - DB_HOST=calendarDB
+      - DB_NAME=meeting_scheduler
+      - DB_USER=calvinator
+      - DB_PASSWORD=calvin123
+    tty: true
+
+  meeting-service:
+    build: ./meeting-service
+    depends_on:
+      - meetingDB
+    networks:
+      meeting_scheduler:
+        ipv4_address: 10.5.142.7
+    ports:
+      - "8002:8002"
+    environment:
+      - DB_HOST=meetingDB
+      - DB_NAME=meeting_scheduler
+      - DB_USER=calvinator
+      - DB_PASSWORD=calvin123
+    tty: true
+
+  participant-service:
+    build: ./participant-service
+    depends_on:
+      - participantDB
+    networks:
+      meeting_scheduler:
+        ipv4_address: 10.5.142.8
+    ports:
+      - "8003:8003"
+    environment:
+      - DB_HOST=participantDB
+      - DB_NAME=meeting_scheduler
+      - DB_USER=calvinator
+      - DB_PASSWORD=calvin123
+    tty: true
+
+  attachment-service:
+    build: ./attachment-service
+    depends_on:
+      - attachmentDB
+    networks:
+      meeting_scheduler:
+        ipv4_address: 10.5.142.9
+    ports:
+      - "8004:8004"
+    environment:
+      - DB_HOST=attachmentDB
+      - DB_NAME=meeting_scheduler
+      - DB_USER=calvinator
+      - DB_PASSWORD=calvin123
+    tty: true
+
+  api-gateway:
+    build: ./api-gateway
+    depends_on:
+      - calendar-service
+      - meeting-service
+      - participant-service
+      - attachment-service
+    networks:
+      meeting_scheduler:
+        ipv4_address: 10.5.142.10
+    ports:
+      - "8000:8000"
+    tty: true
+
+  web-presentation:
+    build: ./web-presentation
+    depends_on:
+      - api-gateway
+    networks:
+      meeting_scheduler:
+        ipv4_address: 10.5.142.11
+    ports:
+      - "3000:3000"
+
+  cli-presentation:
+    build: ./cli-presentation
+    depends_on:
+      - api-gateway
+    networks:
+      meeting_scheduler:
+        ipv4_address: 10.5.142.12
+    ports:
+      - "3001:3001"
+    tty: true
+
+networks:
+  meeting_scheduler:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.142.0/24
+
+volumes:
+  mysql_data:
