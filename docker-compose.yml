@@ -161,6 +161,29 @@ services:
       - "3001:3001"
     tty: true
 
+  event-producer:
+    build: ./event-producer
+    depends_on:
+      - api-gateway
+    networks:
+      meeting_scheduler:
+        ipv4_address: 10.5.142.13
+    ports:
+      - "3002:3002"
+    tty: true
+
+  event-channel:
+    build: ./event-channel
+    depends_on:
+      - api-gateway
+    networks:
+      meeting_scheduler:
+        ipv4_address: 10.5.142.14
+    ports:
+      - "6000:6000"
+    tty: true
+    
+
 networks:
   meeting_scheduler:
     driver: bridge
