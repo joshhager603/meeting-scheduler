@@ -2,7 +2,7 @@
 FROM python:3.11-slim
 
 # Set the working directory inside the container
-WORKDIR /event-channel
+WORKDIR /event-broker
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -15,11 +15,11 @@ ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.s
 RUN chmod +x /wait-for-it.sh
 
 # Copy the requirements file and install Python dependencies
-COPY requirements.txt /event-channel/
+COPY requirements.txt /event-broker/
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the entire application code
-COPY . /event-channel/
+COPY . /event-broker/
 
 # Expose the port python will run on
 EXPOSE 6000

@@ -172,8 +172,8 @@ services:
       - "3002:3002"
     tty: true
 
-  event-channel:
-    build: ./event-channel
+  event-broker:
+    build: ./event-broker
     depends_on:
       - api-gateway
     networks:
