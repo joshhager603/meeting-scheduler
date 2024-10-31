@@ -138,6 +138,11 @@ services:
         ipv4_address: 10.5.142.10
     ports:
       - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/meetings"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     tty: true
 
   web-presentation:
@@ -164,7 +169,8 @@ services:
   event-producer:
     build: ./event-producer
     depends_on:
-      - api-gateway
+      - event-consumer
+      - event-broker
     networks:
       meeting_scheduler:
         ipv4_address: 10.5.142.13
@@ -172,16 +178,43 @@ services:
       - "3002:3002"
     tty: true
 
-  event-broker:
-    build: ./event-broker
+  event-consumer:
+    build: ./event-consumer
     depends_on:
-      - api-gateway
+      api-gateway:
+        condition: service_healthy
     networks:
       meeting_scheduler:
         ipv4_address: 10.5.142.14
     ports:
-      - "6000:6000"
+      - "6969:6969"
     tty: true
+
+  event-broker:
+    image: rabbitmq:management
+    container_name: event-broker
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"    # message broker port
+      - "15672:15672"  # UI port
+    networks:
+      meeting_scheduler:
+        ipv4_address: 10.5.142.15
+
+  dead-letter:
+    image: rabbitmq:management
+    container_name: dead-letter
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5673:5673"    # message broker port
+      - "15673:15673"  # UI port
+    networks:
+      meeting_scheduler:
+        ipv4_address: 10.5.142.16
     
 
 networks:

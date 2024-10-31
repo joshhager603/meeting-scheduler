@@ -1,8 +1,8 @@
-# Dockerfile for event-producer
+# Dockerfile for event-broker
 FROM python:3.11-slim
 
 # Set the working directory inside the container
-WORKDIR /event-broker
+WORKDIR /event-consumer
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -15,15 +15,14 @@ ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.s
 RUN chmod +x /wait-for-it.sh
 
 # Copy the requirements file and install Python dependencies
-COPY requirements.txt /event-broker/
+COPY requirements.txt /event-consumer/
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the entire application code
-COPY . /event-broker/
+COPY . /event-consumer/
 
 # Expose the port python will run on
-EXPOSE 6000
+EXPOSE 6969
 
 # Use wait-for-it to ensure api gateway is ready
 CMD ["/wait-for-it.sh", "api-gateway:8000", "--", "bash", "startup.sh"]
-

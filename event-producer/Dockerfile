@@ -25,5 +25,5 @@ COPY . /event-producer/
 EXPOSE 3002
 
 # Use wait-for-it to ensure api gateway is ready
-CMD ["/wait-for-it.sh", "api-gateway:8000", "--", "bash", "startup.sh"]
+CMD ["/wait-for-it.sh", "event-broker:5672", "--", "bash", "startup.sh"]
 

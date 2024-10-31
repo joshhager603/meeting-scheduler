@@ -31,7 +31,7 @@ SECRET_KEY = os.getenv('DJANGO_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*', 'calendar-service', 'meeting-service', 'participant-service', 'attachment-service', 'cli-presentation']
+ALLOWED_HOSTS = ['*', 'calendar-service', 'meeting-service', 'participant-service', 'attachment-service', 'cli-presentation', 'event-consumer']
 
 # Application definition
 

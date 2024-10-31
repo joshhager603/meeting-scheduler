@@ -4,10 +4,11 @@ import pika
 import uuid
 import random
 import json
+import time
 from datetime import datetime
 
 # Configuration for RabbitMQ
-RABBITMQ_HOST = 'localhost'  # Update with your RabbitMQ server address
+RABBITMQ_HOST = 'event-broker'  # Update with your RabbitMQ server address
 QUEUE_NAME = 'meeting_events'
 
 
@@ -15,13 +16,14 @@ QUEUE_NAME = 'meeting_events'
 def connect_to_broker():
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST))
     channel = connection.channel()
+    #channel.exchange_declare(exchange='events_exchange', exchange_type='direct')
     channel.queue_declare(queue=QUEUE_NAME, durable=True)
     return connection, channel
 
 calendar = {
     "id": "6b0d7e96-6bcb-4f79-aab5-5398b68f3c48",
     "title": "Software Architecture Fall 2024",
-    "description": "this is a calendar for software architecture",
+    "details": "this is a calendar for software architecture",
     "meetings": []
 }
 
@@ -29,11 +31,12 @@ calendar = {
 def generate_meeting_data():
     return {
         "id": str(uuid.uuid4()),
+        "calendar_id": "6b0d7e96-6bcb-4f79-aab5-5398b68f3c48",
         "title": "Team Meeting " + str(random.randint(1, 100)),
-        "date": datetime.now().strftime("%Y-%m-%d %I:%M %p"),
+        "date": datetime.now().strftime("%Y-%m-%d"),
+        "time": datetime.now().strftime("%H:%M:%S"),
         "location": "Meeting Room " + str(random.randint(1, 10)),
-        "details": "Discussing project updates and tasks.",
-        "calendar_id": "6b0d7e96-6bcb-4f79-aab5-5398b68f3c48"
+        "details": "Discussing project updates and tasks."
     }
 
 # Generate participant data
@@ -42,7 +45,7 @@ def generate_participant_data(meeting_id):
         "id": str(uuid.uuid4()),
         "meeting_id": meeting_id,
         "name": f"Participant {random.randint(1, 100)}",
-        "email": f"participant{random.randint(1, 100)}@example.com"
+        "email": f"participant{random.randint(1, 100)}@example.com",
     }
 
 # Generate attachment data
@@ -50,7 +53,7 @@ def generate_attachment_data(meeting_id):
     return {
         "id": str(uuid.uuid4()),
         "meeting_id": meeting_id,
-        "url": f"http://example.com/attachment{random.randint(1, 100)}"
+        "url": f"http://example.com/attachment{random.randint(1, 100)}",
     }
 
 # Inject errors into the data for testing purposes
@@ -72,19 +75,19 @@ def inject_errors(event):
 def create_event_batch(batch_size=500):
     events = []
     for _ in range(batch_size):
-        meeting = generate_meeting_data()
-        participants = [generate_participant_data(meeting['id']) for _ in range(random.randint(50, 100))]
-        attachments = [generate_attachment_data(meeting['id']) for _ in range(random.randint(5, 10))]
+        meeting = [generate_meeting_data()]
+        participants = [generate_participant_data(meeting[0]['id']) for _ in range(random.randint(50, 100))]
+        attachments = [generate_attachment_data(meeting[0]['id']) for _ in range(random.randint(5, 10))]
 
         # Inject errors into some records
-        inject_errors(meeting)
+        inject_errors(meeting[0])
         for participant in participants:
             inject_errors(participant)
         for attachment in attachments:
             inject_errors(attachment)
 
         events.append({
-            "meeting": meeting,
+            "meetings": meeting,
             "participants": participants,
             "attachments": attachments
         })
@@ -105,10 +108,16 @@ def publish_batch(channel, batch):
 def main():
     connection, channel = connect_to_broker()
 
-    try:
-        batch = create_event_batch(batch_size=500)
-        publish_batch(channel, batch);
 
+    
+    try:
+        while True:
+            publish_batch(channel, [{'calendars' : [calendar]}])
+
+            batch = create_event_batch(batch_size=500)
+            publish_batch(channel, batch)
+
+            time.sleep(30)
     finally:
         connection.close()
 
